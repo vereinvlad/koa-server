@@ -6,6 +6,23 @@ const router = new Router();
 
 const users = require("users");
 
+const Yup = require("yup");
+const validator = require("koa-yup-validator");
+
+const ideaValidationSchema = Yup.object().shape({
+    title: Yup.string()
+      .min(4, 'Should be more than 4 characters')
+      .max(20, 'Should be less than 20 characters')
+      .required('Required'),
+    description: Yup.string()
+      .min(20, 'Should be more than 20 characters')
+      .required('Required'),
+    author: Yup.string()
+      .min(4, 'Should be more than 4 characters')
+      .max(30, 'Should be less than 30 characters')
+      .matches(/^[a-zA-Zа-яА-Я ]+$/, 'Only letters allowed')
+  });
+
 const isAuth = (ctx, next) => {
     for (const user in users) {
         if (ctx.request.body.login === users[user].login && ctx.request.body.password === users[user].password) {
@@ -16,20 +33,20 @@ const isAuth = (ctx, next) => {
 }
 
 router
-    .get("/ideas", ctx => {
+    .get("/ideasCards", async ctx => {
         return AppModule.getIdeas(ctx);
     })
-    .get("/ideas/:id", ctx => {
+    .get("/ideasCards/:id", ctx => {
         return AppModule.getSingleIdea(ctx);
     })
-    .post("/ideas", ctx => {
+    .post("/ideasCards", validator(ideaValidationSchema), ctx => {
         return AppModule.postIdeas(ctx);
     })
-    .delete("/ideas/:id", ctx => {
+    .delete("/ideasCards/:id", async ctx => {
         return AppModule.deleteIdea(ctx);
     })
-    .put("/ideas/:id", ctx => {
-        return AppModule.putIdea(ctx);
+    .patch("/ideasCards/:id", validator(ideaValidationSchema), ctx => {
+        return AppModule.patchIdea(ctx);
     })
     .post("/user", isAuth, ctx => {
         return AppModule.login(ctx);

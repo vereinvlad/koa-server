@@ -1,41 +1,30 @@
 const Response = require("core/Response");
-let data = require("ideas");
+
 class AppModule {
     async login(ctx) {
         return Response.success(ctx);
     }
     async getIdeas(ctx) {
-        return Response.json(ctx, data);
+        const result = await ctx.db.query(`SELECT * FROM ideas`);
+        ctx.body = result.rows;
     }
     async getSingleIdea(ctx) {
-        for (const item in data) {
-            if (data[item].id === Number(ctx.params.id)) {
-                return Response.json(ctx, data.find(el => el.id === Number(ctx.params.id))); 
-            }
-        }
-        return Response.error(ctx);
+        const result = await ctx.db.query(`SELECT * FROM ideas WHERE id=$1`, [ctx.params.id]);
+        ctx.body = result.rows[0];
     }
     async postIdeas(ctx) {
-        data.push(ctx.request.body);
-        return Response.json(ctx, ctx.request.body);
+        const { title, description, author} = ctx.request.body;
+        const result = await ctx.db.query('INSERT INTO ideas (title, description, author) VALUES ($1, $2, $3) RETURNING *', [title, description, author]); 
+        ctx.body = result.rows[0];
     }
     async deleteIdea(ctx) {
-        for (const item in data) {
-            if (data[item].id === Number(ctx.params.id)) {
-                data = data.filter(el => el.id !== Number(ctx.params.id));
-                return Response.json(ctx, data);
-            }
-        }
-        return Response.error(ctx);
+        const result = await ctx.db.query('DELETE FROM ideas WHERE id=$1', [ctx.params.id])  
+        ctx.body = result.rows;
     }
-    async putIdea(ctx) {
-        data.map(item => {
-            if (item.id === Number(ctx.params.id)) {
-                item = {...item, ...ctx.request.body};
-            }
-            return item;
-        });
-        return Response.json(ctx, data);
+    async patchIdea(ctx) {
+        const { title, description} = ctx.request.body;
+        const result = await ctx.db.query(`UPDATE ideas SET title=$1, description=$2 WHERE id=$3 RETURNING *`, [title, description, ctx.params.id]);
+        ctx.body = result.rows[0];
     }
 }
 
