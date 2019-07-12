@@ -2,9 +2,8 @@ const Koa = require("koa");
 const cors = require("koa2-cors");
 const bodyParser = require("koa-bodyparser");
 
-const config = require('config');
 const mainRoutes = require("routes/main");
-const db = require('../lib/database');
+const database = require('../lib/database');
 const app = new Koa();
 
 
@@ -14,8 +13,8 @@ app.init = async () => {
   }));
 
   app.use(bodyParser());
-  const connection = await db.getConnection(); 
-  app.context.db = connection;
+  await database.sync() 
+  app.context.sequelize = database;
   // routes
   app.use(mainRoutes);
 };
