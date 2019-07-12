@@ -1,23 +1,4 @@
-const Sequelize = require('sequelize');
-const myProjDB = require('lib/database');
-
-const Ideas = myProjDB.define('ideas', {
-    title: {
-      type: Sequelize.STRING,
-    },
-    description: {
-      type: Sequelize.STRING
-    },
-    author: {
-        type: Sequelize.STRING
-    }
-  }, 
-    { myProjDB, tableName: 'ideas', timestamps: false }
-);
-
-module.exports = Ideas;
-/*
-class AppModule {
+class ManagerIdeas {
     async login(ctx) {
         return Response.success(ctx);
     }
@@ -45,4 +26,4 @@ class AppModule {
     }
 }
 
-module.exports = new AppModule();*/
+module.exports = new ManagerIdeas();
