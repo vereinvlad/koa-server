@@ -10,7 +10,9 @@ const sessionValidator = (ctx, next) => {
     if(ctx.session.user_id) {
         next();
     }
-    ctx.assert(false, 401, 'Please login!');
+    else {
+        ctx.assert(false, 401, 'Please login!');
+    }
 }
 
 router
@@ -30,7 +32,7 @@ router
         ctx.body = allIdeas;
     })
     .get("/ideasCards/:id", sessionValidator, async ctx => {
-            const singleIdea = await Ideas.findOne(
+        const singleIdea = await Ideas.findOne(
             { 
                 where: { id : ctx.params.id},
                 attributes: ['id', 'title', 'description', [Sequelize.col('user.login'), 'author']],
@@ -45,6 +47,9 @@ router
         ctx.body = singleIdea;
     })
     .post("/ideasCards", sessionValidator, async ctx => {
+        if (!ctx.request.body.title || !ctx.request.body.description) {
+            throw new Error;
+        }
         const newIdea = await Ideas.create(ctx.request.body, {fields: ['title', 'description']});
         ctx.body = newIdea;
     })
