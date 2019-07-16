@@ -8,11 +8,16 @@ const Ideas = myProjDB.define('ideas', {
       type: Sequelize.STRING,
     },
     description: {
-      type: Sequelize.STRING
-    }
+      type: Sequelize.STRING,
+    },
+    author_id: {
+      type: Sequelize.INTEGER,
+    },
+
   }, 
     { myProjDB, tableName: 'ideas', timestamps: false }
 );
-Ideas.belongsTo(Users, {foreignKey: 'author_id'})
+
+Ideas.belongsTo(Users, {foreignKey: 'author_id', targetKey: 'id'})
 
 module.exports = Ideas;

@@ -6,7 +6,7 @@ let chaiHttp = require('chai-http');
 let Server = require('../core/Server');
 let app = require('../core/App');
 const config = require('../config');
-
+  
 chai.should();
 
 chai.use(chaiHttp);
